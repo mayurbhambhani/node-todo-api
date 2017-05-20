@@ -5,9 +5,18 @@ const { Todo } = require("../server/db/models/Todo");
 
 describe("server", () => {
     let app = require("../server/server").app;
-
+    let seedTodos = [{
+        text: "seed todo 1"
+    },
+    {
+        text: "seed todo 2"
+    }];
     beforeEach((done) => {
-        Todo.remove({}).then(() => done());
+        Todo.remove({}).then(() => {
+            return Todo.insertMany(seedTodos);
+        }).then(() => done()).catch((e) => {
+            done(e);
+        })
     });
     it("add todo", (done) => {
         let todoJson = { 'text': 'wake up chotu' };
@@ -47,12 +56,25 @@ describe("server", () => {
             .end((err, res) => {
                 Todo.find(todoJson)
                     .then((docs) => {
-                        expect(docs.length).toBe(0);
+                        expect(docs.length).toBe(2);
                         done();
                     }).catch((err) => {
                         done(err);
                     });
 
+            });
+    });
+
+
+    it("test list todos", (done) => {
+        let todoJson = {};
+        request(app)
+            .get("/todos")
+            .expect(200)
+            .end((err, res) => {
+                console.log("response", res.body);
+                expect(res.body.length).toBe(2);
+                done();
             });
     });
 });
