@@ -29,7 +29,16 @@ app.post("/todos", (req, res) => {
         res.send(err);
     });
 
-})
+});
+
+app.get("/todos", (req, res) => {
+    Todo.find().then((todos) => {
+        res.send(todos);
+    }).catch((e) => {
+        console.log("unable to fetch todos");
+        res.status(400);
+    })
+});
 
 
 
