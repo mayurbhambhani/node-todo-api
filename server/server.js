@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
     res.send("todo rest api is up. Dont doubt the server for your screw ups")
 });
 
-app.post("/todo", (req, res) => {
+app.post("/todos", (req, res) => {
     let todo = new Todo({
         text: req.body.text,
     });
@@ -36,6 +36,9 @@ app.post("/todo", (req, res) => {
 app.listen(3000, () => {
     console.log("listening on 3000");
 })
+
+
+module.exports = { app };
 
 
 
