@@ -59,6 +59,24 @@ app.get("/todos/:id", (req, res) => {
 });
 
 
+app.delete("/todos/:id", (req, res) => {
+    if (!ObjectID.isValid(req.params.id)) {
+        return res.status(404).send({ error: `Invalid id:${req.params.id}.` });
+    }
+    Todo.findByIdAndRemove(
+        req.params.id, (err, todo) => {
+            if (!todo) {
+                return res.status(404).send({ error: `Id ${req.params.id} not found.` });
+            }
+            res.send(todo);
+        }
+    ).catch((e) => {
+        console.log("unable to fetch todos");
+        res.status(400);
+    })
+});
+
+
 
 app.listen(port, () => {
     console.log("listening on", port);

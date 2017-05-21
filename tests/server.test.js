@@ -140,5 +140,66 @@ describe("server", () => {
 
     });
 
+    // -----------
+    it("test delete todo by id", (done) => {
+        {
+            let id = seedTodos[0]._id;
+            request(app)
+                .delete(`/todos/${id}`)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    // console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text)._id).toEqual(seedTodos[0]._id);
+                    done();
+                });
+
+        }
+
+
+    });
+    // 59208e80545a6434f233ac1e
+
+    it("test delete todo with non-existent id", (done) => {
+
+        let id = seedTodos[0]._id;
+        let id_prefix = parseInt(id.toHexString().substr(0, 1));
+        let new_id_prefix = id_prefix + 1;
+        let new_id = new ObjectID(new_id_prefix + id.toHexString().substr(1));
+        //console.log(id, new_id)
+        request(app)
+            .delete(`/todos/${new_id}`)
+            .expect(404)
+            .end((err, res) => {
+                if (err) {
+                    console.log(err);
+                    done(err);
+                } else {
+                    done();
+                }
+            });
+
+    });
+
+
+    it("test delete todo with invalid id", (done) => {
+
+        let id = "invalid_mongo_id";
+        request(app)
+            .delete(`/todos/${id}`)
+            .expect(404)
+            .end((err, res) => {
+                if (err) {
+                    console.log(err);
+                    done(err);
+                }
+                done();
+            });
+
+    });
+
 });
 
