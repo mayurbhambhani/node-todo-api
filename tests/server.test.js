@@ -201,5 +201,97 @@ describe("server", () => {
 
     });
 
+    // --------------------
+    it("test patch todo by id with completed false", (done) => {
+        {
+            let todoJson = { 'text': 'wake up chotu' };
+            let id = seedTodos[0]._id;
+            request(app)
+                .patch(`/todos/${id}`)
+                .send(todoJson)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    // console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text).text).toEqual(todoJson.text);
+                    expect(JSON.parse(res.text).completed).toBeA('boolean').toBe(false);
+                    expect(JSON.parse(res.text).completedAt).toBe(null);
+                    done();
+                });
+
+        }
+
+
+    });
+
+    it("test patch todo by id with completed true", (done) => {
+        {
+            let todoJson = { 'text': 'wake up chotu', "completed": true };
+            let id = seedTodos[0]._id;
+            request(app)
+                .patch(`/todos/${id}`)
+                .send(todoJson)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    // console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text).text).toEqual(todoJson.text);
+                    expect(JSON.parse(res.text).completed).toBeA('boolean').toBe(true);
+                    expect(JSON.parse(res.text).completedAt).toBeA('number');
+                    done();
+                });
+
+        }
+
+
+    });
+    // 59208e80545a6434f233ac1e
+
+    it("test patch todo with non-existent id", (done) => {
+
+        let id = seedTodos[0]._id;
+        let id_prefix = parseInt(id.toHexString().substr(0, 1));
+        let new_id_prefix = id_prefix + 1;
+        let new_id = new ObjectID(new_id_prefix + id.toHexString().substr(1));
+        //console.log(id, new_id)
+        request(app)
+            .patch(`/todos/${new_id}`)
+            .send({})
+            .expect(404)
+            .end((err, res) => {
+                if (err) {
+                    console.log(err);
+                    done(err);
+                } else {
+                    done();
+                }
+            });
+
+    });
+
+
+    it("test patch todo with invalid id", (done) => {
+
+        let id = "invalid_mongo_id";
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({})
+            .expect(404)
+            .end((err, res) => {
+                if (err) {
+                    console.log(err);
+                    done(err);
+                }
+                done();
+            });
+
+    });
+
 });
 

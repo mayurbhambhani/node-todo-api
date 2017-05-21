@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectID } = require("mongodb");
+const _ = require("lodash");
 
 const { mongoose } = require("./db/mongoose");
 const { User } = require("./db/models/User");
@@ -76,7 +77,30 @@ app.delete("/todos/:id", (req, res) => {
     })
 });
 
+app.patch("/todos/:id", (req, res) => {
+    if (!ObjectID.isValid(req.params.id)) {
+        return res.status(404).send({ error: `Invalid id:${req.params.id}.` });
+    }
+    let update = _.pick(req.body, ['text', 'completed']);
+    if (_.isBoolean(update.completed) && update.completed) {
+        update.completedAt = new Date().getTime();
+    } else {
+        update.completed = false;
+        update.completedAt = null;
+    }
 
+    Todo.findByIdAndUpdate(
+        req.params.id, { $set: update }, { new: true }).then((todo) => {
+            if (!todo) {
+                return res.status(404).send({ error: `Id ${req.params.id} not found.` });
+            }
+            res.send(todo);
+        })
+        .catch((e) => {
+            console.log("unable to update todos", e);
+            res.status(400);
+        })
+});
 
 app.listen(port, () => {
     console.log("listening on", port);
