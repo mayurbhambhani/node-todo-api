@@ -10,6 +10,7 @@ const _ = require("lodash");
 const { mongoose } = require("./db/mongoose");
 const { User } = require("./db/models/User");
 const { Todo } = require("./db/models/Todo");
+const { authenticate } = require("./middleware/authenticate");
 
 
 
@@ -37,6 +38,25 @@ app.post("/todos", (req, res) => {
         res.send(err);
     });
 
+});
+
+app.post("/users", (req, res) => {
+    let userJson = _.pick(['emai', 'password'])
+    let user = new User(req.body, userJson);
+    user.save().then(() => {
+        return user.generateAuthToken();
+
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((err) => {
+        console.log("unable to save user", err);
+        res.status(400).send({ err });
+    });
+
+});
+
+app.get("/users/me", authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 app.get("/todos", (req, res) => {
