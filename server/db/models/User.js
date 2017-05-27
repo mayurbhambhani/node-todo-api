@@ -111,7 +111,7 @@ UserSchema.pre("save", function (next) {
         next();
     }
 
-})
+});
 
 UserSchema.methods.generateAuthToken = function () {
     let user = this;
