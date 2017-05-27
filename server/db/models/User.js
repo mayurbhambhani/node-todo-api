@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 
 let UserSchema = mongoose.Schema({
     email: {
+        unique: true,
         type: String,
         required: true,
         minlength: 1,
@@ -14,7 +15,6 @@ let UserSchema = mongoose.Schema({
             validator: validator.isEmail,
             message: "{VALUE} is not a valid email."
         },
-        unique: true
     },
 
     password: {

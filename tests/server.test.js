@@ -15,9 +15,11 @@ describe("server", () => {
     beforeEach(populateUsers);
     it("add todo", (done) => {
         let todoJson = { 'text': 'wake up chotu' };
+        let token = seedUsers[0].tokens[0].token;
         request(app)
             .post("/todos")
             .send(todoJson)
+            .set('x-auth', token)
             .expect(200)
             .expect((res) => {
 
@@ -62,21 +64,25 @@ describe("server", () => {
 
 
     it("test list todos", (done) => {
+        let token = seedUsers[0].tokens[0].token;
         request(app)
             .get("/todos")
+            .set('x-auth', token)
             .expect(200)
             .end((err, res) => {
                 // console.log("response", res.body);
-                expect(res.body.length).toBe(2);
+                expect(res.body.length).toBe(1);
                 done();
             });
     });
 
     it("test fetch todo by id", (done) => {
         {
+            let token = seedUsers[0].tokens[0].token;
             let id = seedTodos[0]._id;
             request(app)
                 .get(`/todos/${id}`)
+                .set('x-auth', token)
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
@@ -100,9 +106,11 @@ describe("server", () => {
         let id_prefix = parseInt(id.toHexString().substr(0, 1));
         let new_id_prefix = id_prefix + 1;
         let new_id = new ObjectID(new_id_prefix + id.toHexString().substr(1));
+        let token = seedUsers[0].tokens[0].token;
         //console.log(id, new_id)
         request(app)
             .get(`/todos/${new_id}`)
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
@@ -119,15 +127,18 @@ describe("server", () => {
     it("test fetch todo with invalid id", (done) => {
 
         let id = "invalid_mongo_id";
+        let token = seedUsers[0].tokens[0].token;
         request(app)
             .get(`/todos/${id}`)
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
                     // console.log(err);
                     done(err);
+                } else {
+                    done();
                 }
-                done();
             });
 
     });
@@ -136,8 +147,10 @@ describe("server", () => {
     it("test delete todo by id", (done) => {
         {
             let id = seedTodos[0]._id;
+            let token = seedUsers[0].tokens[0].token;
             request(app)
                 .delete(`/todos/${id}`)
+                .set('x-auth', token)
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
@@ -161,9 +174,11 @@ describe("server", () => {
         let id_prefix = parseInt(id.toHexString().substr(0, 1));
         let new_id_prefix = id_prefix + 1;
         let new_id = new ObjectID(new_id_prefix + id.toHexString().substr(1));
+        let token = seedUsers[0].tokens[0].token;
         //console.log(id, new_id)
         request(app)
             .delete(`/todos/${new_id}`)
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
@@ -180,15 +195,18 @@ describe("server", () => {
     it("test delete todo with invalid id", (done) => {
 
         let id = "invalid_mongo_id";
+        let token = seedUsers[0].tokens[0].token;
         request(app)
             .delete(`/todos/${id}`)
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
                     // console.log(err);
                     done(err);
+                } else {
+                    done();
                 }
-                done();
             });
 
     });
@@ -198,9 +216,11 @@ describe("server", () => {
         {
             let todoJson = { 'text': 'wake up chotu' };
             let id = seedTodos[0]._id;
+            let token = seedUsers[0].tokens[0].token;
             request(app)
                 .patch(`/todos/${id}`)
                 .send(todoJson)
+                .set('x-auth', token)
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
@@ -223,9 +243,11 @@ describe("server", () => {
         {
             let todoJson = { 'text': 'wake up chotu', "completed": true };
             let id = seedTodos[0]._id;
+            let token = seedUsers[0].tokens[0].token;
             request(app)
                 .patch(`/todos/${id}`)
                 .send(todoJson)
+                .set('x-auth', token)
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
@@ -251,10 +273,12 @@ describe("server", () => {
         let id_prefix = parseInt(id.toHexString().substr(0, 1));
         let new_id_prefix = id_prefix + 1;
         let new_id = new ObjectID(new_id_prefix + id.toHexString().substr(1));
+        let token = seedUsers[0].tokens[0].token;
         //console.log(id, new_id)
         request(app)
             .patch(`/todos/${new_id}`)
             .send({})
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
@@ -271,9 +295,11 @@ describe("server", () => {
     it("test patch todo with invalid id", (done) => {
 
         let id = "invalid_mongo_id";
+        let token = seedUsers[0].tokens[0].token;
         request(app)
             .patch(`/todos/${id}`)
             .send({})
+            .set('x-auth', token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
