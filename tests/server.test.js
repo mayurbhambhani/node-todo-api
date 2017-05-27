@@ -80,7 +80,7 @@ describe("server", () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));
@@ -106,7 +106,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 } else {
                     done();
@@ -124,7 +124,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 }
                 done();
@@ -141,7 +141,7 @@ describe("server", () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));
@@ -167,7 +167,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 } else {
                     done();
@@ -185,7 +185,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 }
                 done();
@@ -204,7 +204,7 @@ describe("server", () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));
@@ -229,7 +229,7 @@ describe("server", () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));
@@ -258,7 +258,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 } else {
                     done();
@@ -277,7 +277,7 @@ describe("server", () => {
             .expect(404)
             .end((err, res) => {
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     done(err);
                 }
                 done();
@@ -296,7 +296,7 @@ describe("server", () => {
                     .expect(200)
                     .end((err, res) => {
                         if (err) {
-                            console.log(err);
+                            // console.log(err);
                             done(err);
                         }
                         // console.log("response", JSON.stringify(res));
@@ -319,7 +319,51 @@ describe("server", () => {
                     .expect(401)
                     .end((err, res) => {
                         if (err) {
-                            console.log(err);
+                            // console.log(err);
+                            done(err);
+                        }
+                        // console.log("response", JSON.stringify(res));
+                        expect(JSON.parse(res.text)).toEqual({ err: "fuck you" });
+                        done();
+                    });
+
+            }
+
+
+        });
+    });
+
+    // -------------------------------
+    describe("DELETE /users/me/token", () => {
+        it("positive test case", (done) => {
+            {
+                let token = seedUsers[0].tokens[0].token;
+                //console.log({ token });
+                request(app)
+                    .delete(`/users/me/token`)
+                    .set('x-auth', token)
+                    .expect(200)
+                    .end((err, res) => {
+                        if (err) {
+                            // console.log(err);
+                            done(err);
+                        }
+                        done();
+                    });
+            }
+        });
+
+        it("negative test case", (done) => {
+            {
+                let token = "wrong token";
+                //console.log({ token });
+                request(app)
+                    .delete(`/users/me/token`)
+                    .set('x-auth', token)
+                    .expect(401)
+                    .end((err, res) => {
+                        if (err) {
+                            // console.log(err);
                             done(err);
                         }
                         // console.log("response", JSON.stringify(res));
@@ -343,10 +387,10 @@ describe("server", () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        //console.log(err);
                         done(err);
                     }
-                    console.log("response", JSON.stringify(res));
+                    // console.log("response", JSON.stringify(res));
                     expect(JSON.parse(res.text)._id).toEqual(seedUsers[1]._id);
                     done();
                 });
@@ -364,7 +408,7 @@ describe("server", () => {
                 .expect(401)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));
@@ -385,7 +429,7 @@ describe("server", () => {
                 .expect(401)
                 .end((err, res) => {
                     if (err) {
-                        console.log(err);
+                        // console.log(err);
                         done(err);
                     }
                     // console.log("response", JSON.stringify(res));

@@ -31,10 +31,10 @@ app.post("/todos", (req, res) => {
         text: req.body.text,
     });
     todo.save().then((doc) => {
-        console.log("saved todo", doc);
+        //console.log("saved todo", doc);
         res.send(doc);
     }, (err) => {
-        console.log("unable to save todo");
+        //console.log("unable to save todo");
         res.status(400);
         res.send(err);
     });
@@ -50,7 +50,7 @@ app.post("/users", (req, res) => {
     }).then((token) => {
         res.header('x-auth', token).send(user);
     }).catch((err) => {
-        console.log("unable to save user", err);
+        //console.log("unable to save user", err);
         res.status(400).send(err);
     });
 
@@ -64,9 +64,20 @@ app.post("/users/login", (req, res) => {
         });
 
     }).catch((err) => {
-        console.log("Error while logging in", err);
+        //console.log("Error while logging in", err);
         res.status(401).send(err);
     })
+});
+
+
+app.delete("/users/me/token", authenticate, (req, res) => {
+    let token = req.token;
+    let user = req.user;
+    user.deleteToken(token).then(() => {
+        res.send({ msg: "You are now logged out. See you soon!!" })
+    }).catch((err) => {
+        res.status(401);
+    });
 });
 
 app.get("/users/me", authenticate, (req, res) => {
@@ -77,7 +88,7 @@ app.get("/todos", (req, res) => {
     Todo.find().then((todos) => {
         res.send(todos);
     }).catch((e) => {
-        console.log("unable to fetch todos");
+        // console.log("unable to fetch todos");
         res.status(400);
     })
 });
@@ -94,7 +105,7 @@ app.get("/todos/:id", (req, res) => {
             res.send(todo);
         }
     ).catch((e) => {
-        console.log("unable to fetch todos");
+        //console.log("unable to fetch todos");
         res.status(400);
     })
 });
@@ -112,7 +123,7 @@ app.delete("/todos/:id", (req, res) => {
             res.send(todo);
         }
     ).catch((e) => {
-        console.log("unable to fetch todos");
+        //console.log("unable to fetch todos");
         res.status(400);
     })
 });
@@ -137,7 +148,7 @@ app.patch("/todos/:id", (req, res) => {
             res.send(todo);
         })
         .catch((e) => {
-            console.log("unable to update todos", e);
+            //console.log("unable to update todos", e);
             res.status(400);
         })
 });
