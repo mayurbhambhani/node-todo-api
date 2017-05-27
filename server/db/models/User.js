@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 const _ = require("lodash");
 const bcrypt = require("bcryptjs");
 
+
+const jwt_secret = process.env.JWT_SECRET;
+
 let UserSchema = mongoose.Schema({
     email: {
         unique: true,
@@ -20,7 +23,7 @@ let UserSchema = mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6, con
+        minlength: 6,
         trim: true,
     },
     tokens: [
@@ -87,7 +90,7 @@ UserSchema.statics.findByToken = function (token) {
     let User = this;
     let decoded;
     try {
-        decoded = jwt.verify(token, "abc123");
+        decoded = jwt.verify(token, jwt_secret);
     } catch (error) {
         // return new Promise((resolve, reject) => {
         //     reject({ err: "fuck you" });
@@ -127,7 +130,7 @@ UserSchema.pre("save", function (next) {
 UserSchema.methods.generateAuthToken = function () {
     let user = this;
     let access = "auth";
-    let token = jwt.sign({ _id: user._id.toHexString(), access }, "abc123");
+    let token = jwt.sign({ _id: user._id.toHexString(), access }, jwt_secret);
     user.tokens.push({ access, token });
     // returning a then. A then on then will be passed the first then's return value.
     return user.save().then(() => {

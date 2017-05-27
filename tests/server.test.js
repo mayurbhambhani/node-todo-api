@@ -5,10 +5,11 @@ const _ = require("lodash");
 
 
 const { Todo } = require("../server/db/models/Todo");
+let app = require("../server/server").app;
 const { populateTodos, seedTodos, seedUsers, populateUsers } = require("./seeds.js");
 
 describe("server", () => {
-    let app = require("../server/server").app;
+
 
     beforeEach(populateTodos);
 

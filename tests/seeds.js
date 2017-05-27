@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const { Todo } = require("../server/db/models/Todo");
 const { User } = require("../server/db/models/User");
 
+
+const jwt_secret = process.env.JWT_SECRET;
 let user1Id = new ObjectID();
 let user2Id = new ObjectID();
 
@@ -27,7 +29,7 @@ let seedUsers = [{
     password: "user1Pass",
     tokens: [{
         access: "auth",
-        token: jwt.sign({ _id: user1Id.toHexString(), access: "auth" }, "abc123")
+        token: jwt.sign({ _id: user1Id.toHexString(), access: "auth" }, jwt_secret)
     }]
 },
 {
