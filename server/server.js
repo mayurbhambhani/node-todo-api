@@ -21,9 +21,10 @@ let app = express();
 
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-    res.send("todo rest api is up. Dont doubt the server for your screw ups")
-});
+app.get("/",
+    (req, res) => {
+        res.send("todo rest api is up. Dont doubt the server for your screw ups")
+    });
 
 app.post("/todos", (req, res) => {
     let todo = new Todo({
@@ -41,8 +42,8 @@ app.post("/todos", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-    let userJson = _.pick(['emai', 'password'])
-    let user = new User(req.body, userJson);
+    let userJson = _.pick(req.body, ['email', 'password'])
+    let user = new User(userJson);
     user.save().then(() => {
         return user.generateAuthToken();
 
@@ -50,9 +51,22 @@ app.post("/users", (req, res) => {
         res.header('x-auth', token).send(user);
     }).catch((err) => {
         console.log("unable to save user", err);
-        res.status(400).send({ err });
+        res.status(400).send(err);
     });
 
+});
+
+app.post("/users/login", (req, res) => {
+    let userJson = _.pick(req.body, ['email', 'password'])
+    User.findByCredentials(userJson).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+
+    }).catch((err) => {
+        console.log("Error while logging in", err);
+        res.status(401).send(err);
+    })
 });
 
 app.get("/users/me", authenticate, (req, res) => {

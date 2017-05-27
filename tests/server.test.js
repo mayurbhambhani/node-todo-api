@@ -1,26 +1,18 @@
 const request = require("supertest");
 const expect = require("expect");
 const { ObjectID } = require("mongodb");
+const _ = require("lodash");
+
 
 const { Todo } = require("../server/db/models/Todo");
+const { populateTodos, seedTodos, seedUsers, populateUsers } = require("./seeds.js");
 
 describe("server", () => {
     let app = require("../server/server").app;
-    let seedTodos = [{
-        _id: new ObjectID(),
-        text: "seed todo 1"
-    },
-    {
-        _id: new ObjectID(),
-        text: "seed todo 2"
-    }];
-    beforeEach((done) => {
-        Todo.remove({}).then(() => {
-            return Todo.insertMany(seedTodos);
-        }).then(() => done()).catch((e) => {
-            done(e);
-        })
-    });
+
+    beforeEach(populateTodos);
+
+    beforeEach(populateUsers);
     it("add todo", (done) => {
         let todoJson = { 'text': 'wake up chotu' };
         request(app)
@@ -293,5 +285,103 @@ describe("server", () => {
 
     });
 
+    describe("GET /users/me", () => {
+        it("positive test case", (done) => {
+            {
+                let token = seedUsers[0].tokens[0].token;
+                //console.log({ token });
+                request(app)
+                    .get(`/users/me`)
+                    .set('x-auth', token)
+                    .expect(200)
+                    .end((err, res) => {
+                        if (err) {
+                            console.log(err);
+                            done(err);
+                        }
+                        // console.log("response", JSON.stringify(res));
+                        expect(JSON.parse(res.text)._id).toEqual(seedUsers[0]._id);
+                        done();
+                    });
+
+            }
+
+
+        });
+
+        it("negative test case", (done) => {
+            {
+                let token = "wrong token";
+                //console.log({ token });
+                request(app)
+                    .get(`/users/me`)
+                    .set('x-auth', token)
+                    .expect(401)
+                    .end((err, res) => {
+                        if (err) {
+                            console.log(err);
+                            done(err);
+                        }
+                        // console.log("response", JSON.stringify(res));
+                        expect(JSON.parse(res.text)).toEqual({ err: "fuck you" });
+                        done();
+                    });
+
+            }
+
+
+        });
+    });
+
+    describe("POST /users/login", () => {
+        it("positive test case", (done) => {
+            {
+                let user = _.pick(seedUsers[1], ['email', 'password']);
+                //console.log({ token });
+                request(app)
+                    .post(`/users/login`)
+                    .send(user)
+                    .expect(200)
+                    .end((err, res) => {
+                        if (err) {
+                            console.log(err);
+                            done(err);
+                        }
+                        console.log("response", JSON.stringify(res));
+                        expect(JSON.parse(res.text)._id).toEqual(seedUsers[1]._id);
+                        done();
+                    });
+
+            }
+
+
+        });
+
+        it("negative test case", (done) => {
+            {
+                let token = "wrong token";
+                //console.log({ token });
+                request(app)
+                    .get(`/users/me`)
+                    .set('x-auth', token)
+                    .expect(401)
+                    .end((err, res) => {
+                        if (err) {
+                            console.log(err);
+                            done(err);
+                        }
+                        // console.log("response", JSON.stringify(res));
+                        expect(JSON.parse(res.text)).toEqual({ err: "fuck you" });
+                        done();
+                    });
+
+            }
+
+
+        });
+    });
+
 });
+
+
 

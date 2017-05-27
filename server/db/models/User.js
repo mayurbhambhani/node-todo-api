@@ -43,6 +43,33 @@ UserSchema.methods.toJSON = function () {
 
     return _.pick(user, ['email', '_id']);
 }
+UserSchema.statics.findByEmail = function (email) {
+    let User = this;
+    return User.findOne({
+        email,
+    });
+};
+
+UserSchema.statics.findByCredentials = function (userJson) {
+    let User = this;
+    return User.findByEmail(userJson.email).then((user) => {
+        if (!user) {
+            return Promise.reject({ err: "user not found!!" });
+        }
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(userJson.password, user.password, (err, result) => {
+                if (result) {
+                    resolve(user);
+                } else {
+                    reject({ err: "Incorrect password!!" });
+                }
+            });
+        })
+
+    });
+};
+
+
 
 UserSchema.statics.findByToken = function (token) {
     // here this is the model and not the instance
@@ -50,11 +77,12 @@ UserSchema.statics.findByToken = function (token) {
     let decoded;
     try {
         decoded = jwt.verify(token, "abc123");
-    } catch (e) {
-        // return new Promise((then, err) => {
-        //     err({ err: "fuck you" });
+    } catch (error) {
+        // return new Promise((resolve, reject) => {
+        //     reject({ err: "fuck you" });
         // })
         // shorter version
+        // console.log({ error });
         return Promise.reject({ err: "fuck you" });
     }
     return User.findOne({
@@ -67,6 +95,7 @@ UserSchema.statics.findByToken = function (token) {
 }
 UserSchema.pre("save", function (next) {
     let user = this;
+    //console.log("user", user);
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
