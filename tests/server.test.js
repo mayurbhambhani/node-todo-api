@@ -335,49 +335,63 @@ describe("server", () => {
 
     describe("POST /users/login", () => {
         it("positive test case", (done) => {
-            {
-                let user = _.pick(seedUsers[1], ['email', 'password']);
-                //console.log({ token });
-                request(app)
-                    .post(`/users/login`)
-                    .send(user)
-                    .expect(200)
-                    .end((err, res) => {
-                        if (err) {
-                            console.log(err);
-                            done(err);
-                        }
-                        console.log("response", JSON.stringify(res));
-                        expect(JSON.parse(res.text)._id).toEqual(seedUsers[1]._id);
-                        done();
-                    });
-
-            }
-
-
+            let user = _.pick(seedUsers[1], ['email', 'password']);
+            //console.log({ token });
+            request(app)
+                .post(`/users/login`)
+                .send(user)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text)._id).toEqual(seedUsers[1]._id);
+                    done();
+                });
         });
 
         it("negative test case", (done) => {
-            {
-                let token = "wrong token";
-                //console.log({ token });
-                request(app)
-                    .get(`/users/me`)
-                    .set('x-auth', token)
-                    .expect(401)
-                    .end((err, res) => {
-                        if (err) {
-                            console.log(err);
-                            done(err);
-                        }
-                        // console.log("response", JSON.stringify(res));
-                        expect(JSON.parse(res.text)).toEqual({ err: "fuck you" });
-                        done();
-                    });
+            let token = "wrong token";
+            //console.log({ token });
+            let user = _.pick(seedUsers[1], ['email', 'password']);
+            user.email = "a@b.c";
+            //console.log({ token });
+            request(app)
+                .post(`/users/login`)
+                .send(user)
+                .expect(401)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    // console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text)).toEqual({ err: "user not found!!" });
+                    done();
+                });
+        });
 
-            }
-
-
+        it("negative test case", (done) => {
+            let token = "wrong token";
+            //console.log({ token });
+            let user = _.pick(seedUsers[1], ['email', 'password']);
+            user.password = "a@b.c";
+            //console.log({ token });
+            request(app)
+                .post(`/users/login`)
+                .send(user)
+                .expect(401)
+                .end((err, res) => {
+                    if (err) {
+                        console.log(err);
+                        done(err);
+                    }
+                    // console.log("response", JSON.stringify(res));
+                    expect(JSON.parse(res.text)).toEqual({ err: "Incorrect password!!" });
+                    done();
+                });
         });
     });
 
